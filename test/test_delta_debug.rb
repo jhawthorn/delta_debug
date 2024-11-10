@@ -56,4 +56,20 @@ class TestDeltaDebug < Minitest::Test
     result = DeltaDebug.new(harness).ddmin(input)
     assert_equal "<SELECT>", result
   end
+
+  def test_single_input
+    input = "foobar"
+    harness = ->(x) { x.include?("a") }
+
+    result = DeltaDebug.new(harness).ddmin(input)
+    assert_equal "a", result
+  end
+
+  def test_empty_input
+    input = "asdfasdf"
+    harness = ->(v) { true } # always fails
+
+    result = DeltaDebug.new(harness).ddmin(input)
+    assert_equal "", result
+  end
 end

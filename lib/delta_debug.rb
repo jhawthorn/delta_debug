@@ -40,7 +40,7 @@ class DeltaDebug
     end
 
     raise "given input passes test" unless is_failure[input]
-    return [] if is_failure[[]]
+    return convert_input.call([]) if is_failure[[]]
 
     n = 2
     while input.length > 1
