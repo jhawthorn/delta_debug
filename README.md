@@ -1,28 +1,50 @@
 # DeltaDebug
 
-TODO: Delete this and the text below, and describe your gem
+This implements Andreas Zeller's Delta Debugging ddmin algorithm, which aims to take a failing test input and reduce it to a smaller failing input.
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/delta_debug`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-## Installation
-
-TODO: Replace `UPDATE_WITH_YOUR_GEM_NAME_IMMEDIATELY_AFTER_RELEASE_TO_RUBYGEMS_ORG` with your gem name right after releasing it to RubyGems.org. Please do not do it earlier due to security reasons. Alternatively, replace this section with instructions to install your gem from git if you don't plan to release to RubyGems.org.
-
-Install the gem and add to the application's Gemfile by executing:
-
-```bash
-bundle add UPDATE_WITH_YOUR_GEM_NAME_IMMEDIATELY_AFTER_RELEASE_TO_RUBYGEMS_ORG
-```
-
-If bundler is not being used to manage dependencies, install the gem by executing:
-
-```bash
-gem install UPDATE_WITH_YOUR_GEM_NAME_IMMEDIATELY_AFTER_RELEASE_TO_RUBYGEMS_ORG
-```
+See [Simplifying and Isolating Failure-Inducing Input](https://www.st.cs.uni-saarland.de/papers/tse2002/tse2002.pdf) (PDF) and [Why Programs Fail](https://www.whyprogramsfail.com/).
 
 ## Usage
 
-TODO: Write usage instructions here
+To run, we need to provide a test harness to tell the algorithm the test result of the generated reduced inputs.
+
+Unlike some implementations, **the test harness should return `true` for
+"interesting" results** usually this means returning `true` for a failing test.
+`nil` (indeterminate) and `false` (passing) should be returned for other
+inputs.
+
+For example, if we had a buggy HTML parser which crashed on any `SELECT` tag, we could discover this starting from a larger HTML input.
+
+``` ruby
+require "delta_debug"
+
+input = '<SELECT NAME="priority" MULTIPLE SIZE=7>'
+harness = -> (html) do
+  # Here's where we would test some "real" problem
+  if html =~ /<SELECT.*>/
+    puts "found failure: #{html.dump}"
+    true
+  else
+    false
+  end
+end
+
+result = DeltaDebug.new(harness).ddmin(input)
+p result
+```
+
+```
+$ be ruby examples/html_select.rb
+found failure: "<SELECT NAME=\"priority\" MULTIPLE SIZE=7>"
+found failure: "<SELECT NAty\" MULTIPLE SIZE=7>"
+found failure: "<SELECT NALE SIZE=7>"
+found failure: "<SELECT NAZE=7>"
+found failure: "<SELECT N=7>"
+found failure: "<SELECT 7>"
+found failure: "<SELECT7>"
+found failure: "<SELECT>"
+"<SELECT>"
+```
 
 ## Development
 
