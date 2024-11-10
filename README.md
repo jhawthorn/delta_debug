@@ -20,8 +20,9 @@ require "delta_debug"
 
 input = '<SELECT NAME="priority" MULTIPLE SIZE=7>'
 harness = -> (html) do
-  # Here's where we would test some "real" problem
-  if html =~ /<SELECT.*>/
+  # Here's where we would test some "real" problem.
+  # Pretend we have some HTML parser which crashes on selects.
+  if html =~ /<SELECT\b.*>/
     puts "found failure: #{html.dump}"
     true
   else
@@ -41,7 +42,7 @@ found failure: "<SELECT NALE SIZE=7>"
 found failure: "<SELECT NAZE=7>"
 found failure: "<SELECT N=7>"
 found failure: "<SELECT 7>"
-found failure: "<SELECT7>"
+found failure: "<SELECT >"
 found failure: "<SELECT>"
 "<SELECT>"
 ```
