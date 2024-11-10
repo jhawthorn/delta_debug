@@ -18,7 +18,9 @@ For example, if we had a buggy HTML parser which crashed on any `SELECT` tag, we
 ``` ruby
 require "delta_debug"
 
+# Some original failing input we want to reduce
 input = '<SELECT NAME="priority" MULTIPLE SIZE=7>'
+
 harness = -> (html) do
   # Here's where we would test some "real" problem.
   # Pretend we have some HTML parser which crashes on selects.
