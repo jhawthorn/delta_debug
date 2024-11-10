@@ -14,8 +14,18 @@ class DeltaDebug
   def run_test(input)
     print "testing #{input.inspect} = " if verbose
     result = @harness.call(input)
-    p(result ? :pass : :fail) if verbose
-    !result
+    if verbose
+      sign =
+        if result
+          "❌"
+        elsif result.nil?
+          "❔"
+        else
+          "✅"
+        end
+      puts sign
+    end
+    result
   end
 
   def ddmin(input)
@@ -34,7 +44,7 @@ class DeltaDebug
 
     n = 2
     while input.length > 1
-      puts "trying #{input.inspect} n=#{n}" if verbose
+      #puts "trying #{input.inspect} n=#{n}" if verbose
       segments = split(input, n)
       if failing_segment = segments.detect { |x| is_failure[x] }
         input = failing_segment
